@@ -1,4 +1,4 @@
-docker
 !docker/broker/broker.conf
+docker
 go.sum
 .idea

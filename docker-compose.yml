@@ -1,0 +1,30 @@
+services:
+  namesrv:
+    image: dyrnq/rocketmq
+    container_name: mq-namesrv
+    ports:
+      - 9876:9876
+    environment:
+      - TZ=Asia/Shanghai
+      - JAVA_OPT_EXT=-Duser.home=/home/rocketmq -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m
+    volumes:
+      - ./docker/namesrv/logs:/home/rocketmq/logs
+    command: mqnamesrv
+
+  broker:
+    image: dyrnq/rocketmq
+    container_name: mq-broker
+    depends_on:
+      - namesrv
+    ports:
+      - 10909:10909
+      - 10911:10911
+    environment:
+      - NAMESRV_ADDR=namesrv:9876
+      - TZ=Asia/Shanghai
+      - JAVA_OPT_EXT=-Duser.home=/home/rocketmq -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m
+    volumes:
+      - ./docker/broker/logs:/home/rocketmq/logs
+      - ./docker/broker/store:/home/rocketmq/store
+      - ./docker/broker/broker.conf:/etc/rocketmq/broker.conf
+    command: mqbroker -c /etc/rocketmq/broker.conf
